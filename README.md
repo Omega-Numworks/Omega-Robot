@@ -20,9 +20,7 @@ You can contribute to this repo by forking the repo, clonning it, make your chan
   
 
 - [ ] Linking Epsilon and Omega issues and pull request when they are called with #1e for Epsilon and #1 for Omega
-
 - [ ] Old comands like !hug (send a random hug gif)
-
 - [ ] And more comming later!
 
 # What it has to respect 
