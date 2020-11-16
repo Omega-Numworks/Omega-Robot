@@ -24,3 +24,9 @@ You can contribute to this repo by forking the repo, clonning it, make your chan
 - [ ] Old comands like !hug (send a random hug gif)
 
 - [ ] And more comming later!
+
+# What it has to respect 
+- [ ] A clear documentation in `README.md` which contains the installation, configuration and running instructions
+- [ ] Being easily customisable and maybe later with Omega's website
+- [ ] Have a well thought-out separation for commands
+- [ ] Differentiate perfectly and cleanly the 2 servers
