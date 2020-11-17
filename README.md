@@ -1,9 +1,7 @@
 #  Omega robot
 
 <p align="center">
-  <a href="https://github.com/Omega-Numworks/Omega/   issues"><img alt="Issues" src="https://img.shields.io/github/issues/Omega-Numworks/Omega-robot?style=for-the-badge" /></a>
-  <br/>
-  <a href="https://github.com/Omega-Numworks/Omega-Robot"> <img alt ="Status" src="https://img.shields.io/badge/Status-Under%20developpement-yellow?style=for-the-badge"> </a>
+  <a href="https://github.com/Omega-Numworks/Omega-Robot/issues"><img alt="Issues" src="https://img.shields.io/github/issues/Omega-Numworks/Omega-robot?style=for-the-badge" /></a> <a href="https://github.com/Omega-Numworks/Omega-Robot"> <img alt ="Status" src="https://img.shields.io/badge/Status-Under%20developpement-yellow?style=for-the-badge"> </a>
   <br/>
   <a href="https://discord.gg/X2TWhh9"><img alt="Discord" src="https://img.shields.io/discord/663420259851567114?color=blue&labelColor=292929&label=chat%20-%20discord&logo=discord&style=for-the-badge" /></a>
 </p>
