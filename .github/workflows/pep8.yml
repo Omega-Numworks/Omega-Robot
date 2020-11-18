@@ -1,0 +1,52 @@
+name: PEP8 check
+
+on: [pull_request]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        version: 3.8
+    - name: Download pycodestyle
+      run: |
+        pip install pycodestyle
+    - name: Run pycodestyle
+      id: run_pycodestyle
+      run: |
+        echo "::set-output name=pycodestyle::$(pycodestyle .)"
+        pycodestyle .
+      continue-on-error: true
+    - if: steps.run_pycodestyle.outcome == 'failure'
+      name: Comment (failure)
+      uses: actions/github-script@v3
+      env:
+        OUTPUT: ${{ steps.run_pycodestyle.outputs.pycodestyle }}
+      with:
+        github-token: ${{ secrets.AUTH_TOKEN }}
+        script: |
+          const title = "Beep Beep! I found some formatting errors in this PR: \n"
+
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: title + ' \n``` \n' + process.env.OUTPUT + ' \n```'
+          })
+    - if: steps.run_pycodestyle.outcome == 'success'
+      name: Comment (success)
+      uses: actions/github-script@v3
+      env:
+        OUTPUT: ${{ steps.run_pycodestyle.outputs.pycodestyle }}
+      with:
+        github-token: ${{ secrets.AUTH_TOKEN }}
+        script: |
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'Beep Beep! No formatting errors detected! :partying_face:'
+          })
