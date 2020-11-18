@@ -29,5 +29,5 @@ async def on_message(message):
         if message.guid.id == ID_COMEGA:  # Omega commands
             pass
 
-        elif message.guild.id == ID_OMEGA_WTF:  # Omega WTF commands
+        else:  # Omega WTF commands
             pass
