@@ -7,6 +7,12 @@ import commands.all.all_commands as all_cmd
 import commands.omega.omega_commands as omega_cmd
 import commands.omega_wtf.omega_wtf_commands as omega_wtf_cmd
 
+from config import (
+	PREFIX,
+	TOKEN, 
+	ID_OMEGA, 
+	ID_OMEGA_WTF)
+
 omega_robot = discord.client()
 
 # --------------------------------------------------
@@ -14,8 +20,6 @@ omega_robot = discord.client()
 # --------------------------------------------------
 
 __version__ = "under developpement"
-PREFIX = "&"
-# TOKEN =
 
 # --------------------------------------------------
 # Instances of bot's commands
@@ -31,17 +35,13 @@ OMEGA_WTF_COMMANDS = omega_wtf_cmd.OmegaWTFCommands()
 
 @omega_robot.event()
 async def on_message(message):
-	if message.author == omega_robot.user()
+	if message.author == omega_robot.user():
 		return None
 
-	# Omega commands
-	if message.guid.id == "663420259851567114": 
-		pass
-		
-	# Commega WTF commands
-	elif message.guild.id == "685936220395929600":
-		pass
+	if message.guild.id in (ID_OMEGA, ID_OMEGA_WTF):  # Both servers commands
 
-	# Both servers commands
-	else: 
-		pass
+		if message.guid.id == ID_COMEGA:  # Omega commands
+			pass
+		
+		elif message.guild.id == ID_OMEGA_WTF:  # Omega WTF commands
+			pass
