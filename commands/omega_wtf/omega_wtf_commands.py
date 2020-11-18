@@ -1,4 +1,4 @@
-class OmegaCommands:
+class OmegaWTFCommands:
 
     def __init__(self):
         pass
