@@ -1,5 +1,6 @@
 import discord
 import json
+
 import commands.all.all_commands as all_cmd
 import commands.omega.omega_commands as omega_cmd
 import commands.omega_wtf.omega_wtf_commands as omega_wtf_cmd
