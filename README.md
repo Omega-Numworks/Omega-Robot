@@ -1,4 +1,4 @@
-#  Omega robot
+<h1 align="center">Omega robot </h1>
 
 <p align="center">
   <a href="https://github.com/Omega-Numworks/Omega-Robot/issues"><img alt="Issues" src="https://img.shields.io/github/issues/Omega-Numworks/Omega-robot?style=for-the-badge" /></a> <a href="https://github.com/Omega-Numworks/Omega-Robot"> <img alt ="Status" src="https://img.shields.io/badge/Status-Under%20developpement-yellow?style=for-the-badge"> </a>
