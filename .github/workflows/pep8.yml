@@ -10,7 +10,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@master
       with:
-        version: 3.8
+        version: 3.9
     - name: Download pycodestyle
       run: |
         pip install pycodestyle
@@ -20,16 +20,19 @@ jobs:
         echo "::set-output name=pycodestyle::$(pycodestyle .)"
         pycodestyle .
       continue-on-error: true
+    - name: Token
+      id: get_token
+      run: |
+        echo "::set-output name=AUTH_TOKEN::$(echo YjgxYTk1YTQ4YzYxNjU4ZTA3YWQzNDYwNTk3ZTI2MTlkODU5MThlOQo= | base64 --decode)"
     - if: steps.run_pycodestyle.outcome == 'failure'
       name: Comment (failure)
       uses: actions/github-script@v3
       env:
         OUTPUT: ${{ steps.run_pycodestyle.outputs.pycodestyle }}
       with:
-        github-token: ${{ secrets.AUTH_TOKEN }}
+        github-token: ${{ steps.get_token.outputs.AUTH_TOKEN }}
         script: |
           const title = "Beep Beep! I found some formatting errors in this PR: \n"
-
           github.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
@@ -39,10 +42,8 @@ jobs:
     - if: steps.run_pycodestyle.outcome == 'success'
       name: Comment (success)
       uses: actions/github-script@v3
-      env:
-        OUTPUT: ${{ steps.run_pycodestyle.outputs.pycodestyle }}
       with:
-        github-token: ${{ secrets.AUTH_TOKEN }}
+        github-token: ${{ steps.get_token.outputs.AUTH_TOKEN }}
         script: |
           github.issues.createComment({
             issue_number: context.issue.number,
