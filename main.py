@@ -1,34 +1,26 @@
-import discord
+from discord.ext import commands
 import json
 
-import commands.all.all_commands as all_cmd
-import commands.omega.omega_commands as omega_cmd
-import commands.omega_wtf.omega_wtf_commands as omega_wtf_cmd
+from cogs.omega import Omega
+from cogs.moderation import Moderation
+from cogs.fun import Fun
+
+__version__ = "under developpement"
 
 # Configuration
 with open("config.json", "r") as file:
     config = json.load(file)
 
-omega_robot = discord.client()
+bot = commands.Bot(command_prefix=config["PREFIX"])
 
-# Global variables
-__version__ = "under developpement"
-
-# Instances of bot's commands
-ALL_COMMANDS = all_cmd.AllCommands()
-OMEGA_COMMANDS = omega_cmd.OmegaCommands()
-OMEGA_WTF_COMMANDS = omega_wtf_cmd.OmegaWTFCommands()
+# Cogs load
+for cog in (Omega, Moderation, Fun):
+    bot.add_cog(cog(bot))
 
 
-# Bot's events
-@omega_robot.event()
-async def on_message(message):
-    if message.author.bot:
-        return
+@bot.event
+async def on_ready():
+    print(f"Bot {bot.user.name} connected on {len(bot.guilds)} servers")
 
-    if message.guild.id in (ID_OMEGA, ID_OMEGA_WTF):  # Both servers commands
-        if message.guid.id == ID_COMEGA:  # Omega commands
-            pass
 
-        else:  # Omega WTF commands
-            pass
+bot.run(config["TOKEN"])
