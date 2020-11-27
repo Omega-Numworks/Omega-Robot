@@ -17,7 +17,7 @@ jobs:
     - name: Run pycodestyle
       id: run_pycodestyle
       run: |
-        echo "::set-output name=pycodestyle::$(pycodestyle .)"
+        echo "::set-output name=pycodestyle::$(pycodestyle --max-line-length=120 .)"
         pycodestyle .
       continue-on-error: true
     - if: steps.run_pycodestyle.outcome == 'failure'
