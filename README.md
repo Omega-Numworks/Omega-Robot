@@ -13,7 +13,7 @@ You can contribute to this repo by forking the repo, clonning it, make your chan
 
 ##  What are the features?
 
-- [ ] Linking Epsilon and Omega issues and pull request when they are called with #1e for Epsilon and #1 for Omega
+- [x] Linking Epsilon and Omega issues and pull request when they are called with #1e for Epsilon and #1 for Omega
 - [ ] Commands like `!hug` (send a random hug gif)
 - [ ] And more comming later!
 
