@@ -9,7 +9,9 @@ from datetime import datetime
 
 async def get_github_issues(message: discord.Message):
     """
-    Asynchronous generator that return information on each issue identified (with a specific format) in the message.
+    Asynchronous generator that return information on each issue,
+    identified with a specific format, in the message.
+
     If an request error occurs, it send a message and stops.
     """
     matches = re.findall("(?=((^| )#[0-9]+e?($| )))", message.content)
