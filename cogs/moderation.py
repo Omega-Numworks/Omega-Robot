@@ -3,5 +3,7 @@ from discord.ext import commands
 
 
 class Moderation(commands.Cog):
-    def __init__(self, bot):
+    
+    def __init__(self, bot, config):
         self.bot = bot
+        self.config = config
