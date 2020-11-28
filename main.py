@@ -1,5 +1,5 @@
 from discord.ext import commands
-import config_loader
+import json
 
 from cogs.omega import Omega
 from cogs.moderation import Moderation
@@ -8,18 +8,19 @@ from cogs.fun import Fun
 __version__ = "under developpement"
 
 # Configuration
-config = Config_loader()
+with open("config.json", "w") as file:
+    config = json.load(file)
 
-bot = commands.Bot(command_prefix=config.data["PREFIX"])
+bot = commands.Bot(command_prefix=config["PREFIX"])
 
 # Cogs load
 for cog in (Omega, Moderation, Fun):
-    bot.add_cog(cog(bot))
+    bot.add_cog(cog(bot, config))
 
 
 @bot.event
 async def on_ready():
-    print(f"Bot {bot.user.name} connected on {len(bot.guilds)} servers")
+    print(f"Bot {bot.user.name} connected on {len(bot.guilds)} server(s).")
 
 
 bot.run(config["TOKEN"])
