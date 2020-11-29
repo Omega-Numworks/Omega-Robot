@@ -1,18 +1,18 @@
 import discord
 from discord.ext import commands
 
-import re
 import aiohttp
 import asyncio
+import re
 from datetime import datetime
+from typing import AsyncGenerator
 
 
-async def get_github_issues(message: discord.Message):
-    """
-    Asynchronous generator that return information on each issue,
+async def get_github_issues(message: discord.Message) -> AsyncGenerator[dict, None]:
+    """Asynchronous generator that returns information on each issue,
     identified with a specific format, in the message.
 
-    If an request error occurs, it send a message and stops.
+    If a request error occurs, it sends a message and stops.
     """
     matches = re.findall("(?=((^| )#[0-9]+e?($| )))", message.content)
 
@@ -30,6 +30,13 @@ async def get_github_issues(message: discord.Message):
 
 async def make_embed(data: dict) -> discord.Embed:
     embed = discord.Embed(title=data["title"], url=data["html_url"], description=data["body"])
+
+    # Truncate the description if it's above the maximum size
+    if len(embed.description) > 2048:
+        embed.description = embed.description[:2043] + "[...]"
+    print(embed.description)
+    print(len(embed.description))
+
     author = data["user"]
     embed.set_author(name=author["login"], url=author["html_url"], icon_url=author["avatar_url"])
 
@@ -53,7 +60,7 @@ async def make_embed(data: dict) -> discord.Embed:
 
         result = "\n".join(formatted)
 
-        # If the result is over the embed's description's max size, it truncates the result
+        # If the result is over the field's value's max size, it truncates the result
         if len(result) > limit:
             diff = len(result) - limit + 4
 
@@ -70,8 +77,8 @@ async def make_embed(data: dict) -> discord.Embed:
         additional_infos.append(f":speech_balloon: Comments : {data['comments']}")
 
     if data["state"] == "closed":
-        additional_infos.append(f":x: Closed by {data['closed_by']['login']} on "
-                                f"{datetime.strptime(data['closed_at'], '%Y-%m-%dT%H:%M:%SZ').ctime()}")
+        closed_at = datetime.strptime(data["closed_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%b. %d %H:%M %Y")
+        additional_infos.append(f":x: Closed by {data['closed_by']['login']} on {closed_at}")
     elif data["state"] == "open":
         additional_infos.append(":white_check_mark: Open")
 
