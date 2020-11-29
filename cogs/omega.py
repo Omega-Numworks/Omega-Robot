@@ -34,8 +34,6 @@ async def make_embed(data: dict) -> discord.Embed:
     # Truncate the description if it's above the maximum size
     if len(embed.description) > 2048:
         embed.description = embed.description[:2043] + "[...]"
-    print(embed.description)
-    print(len(embed.description))
 
     author = data["user"]
     embed.set_author(name=author["login"], url=author["html_url"], icon_url=author["avatar_url"])
@@ -53,7 +51,6 @@ async def make_embed(data: dict) -> discord.Embed:
             async with session.get(pull_request["url"] + "/commits") as r:
                 commits_data = await r.json()
 
-        limit = 1024
         # Format all commits data into strings
         formatted = ["[`{}`]({}) {} - {}".format(commit['sha'][:7], commit['html_url'], commit['commit']['message'],
                                                  commit['committer']['login']) for commit in commits_data]
@@ -61,12 +58,12 @@ async def make_embed(data: dict) -> discord.Embed:
         result = "\n".join(formatted)
 
         # If the result is over the field's value's max size, it truncates the result
-        if len(result) > limit:
-            diff = len(result) - limit + 4
+        if len(result) > 1024:
+            diff = len(result) - 1024 + 4
 
             while diff > 0:
-                e = formatted.pop(len(formatted) // 2)
-                diff -= len(e) + 1
+                line = formatted.pop(len(formatted) // 2)
+                diff -= len(line) + 1
 
             formatted.insert(len(formatted) // 2 + 1, "...")
             result = "\n".join(formatted)
