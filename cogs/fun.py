@@ -6,18 +6,29 @@ import aiohttp
 # Supported action commands with they template
 # {author} -> command author's mention
 # {target} -> user pinged in the command
-actions = {"hug": "{author} hugs {target}", "pat": "{author} is patting {target}", "kiss": "{author} kiss {target}",
-           "cuddle": "{author} cuddles {target} ❤", "poke": "Hey {target}! {author} poked you", "baka": "{target} BAKA",
-           "slap": "{author} slapped {target}!"}
+actions = {
+    "hug": "{author} hugs {target}",
+    "pat": "{author} is patting {target}",
+    "kiss": "{author} kiss {target}",
+    "cuddle": "{author} cuddles {target} :heart:",
+    "poke": "Hey {target}! {author} poked you",
+    "baka": "{target} BAKA",
+    "slap": "{author} slapped {target}!"
+}
 
 
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # A command that regroups all actions commands
     @commands.command(name="hug", aliases=list(actions.keys())[1:])
     async def action(self, ctx, member: discord.User):
+        """A command that regroups all actions commands
+
+        The command takes a mention as argument, the person on whom the action is performed.
+        <prefix><action> <@mention>
+        All the action commands are stored in the actions dictionary.
+        """
         embed = discord.Embed()
         embed.set_footer(text="powered by nekos.life")
 
