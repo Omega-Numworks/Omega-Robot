@@ -7,43 +7,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Setup Python
-      uses: actions/setup-python@master
       with:
-        version: 3.9
-    - name: Download pycodestyle
-      run: |
-        pip install pycodestyle
-    - name: Run pycodestyle
-      id: run_pycodestyle
-      run: |
-        echo "::set-output name=pycodestyle::$(pycodestyle --max-line-length=120 .)"
-        pycodestyle --max-line-length=120 .
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: 'Run PEP8'
+      uses: quentinguidee/pep8-action@v1
+      id: run_pep8
+      with:
+        arguments: '--max-line-length=120'
       continue-on-error: true
-    - if: steps.run_pycodestyle.outcome == 'failure'
-      name: Comment (failure)
+    - name: 'Comment'
       uses: actions/github-script@v3
       env:
-        OUTPUT: ${{ steps.run_pycodestyle.outputs.pycodestyle }}
+        EXIT_CODE: ${{ steps.run_pep8.outputs.exit-code }}
+        OUTPUT: ${{ steps.run_pep8.outputs.output }}
       with:
         github-token: ${{ secrets.OMEGA_ROBOT_TOKEN }}
         script: |
-          const title = "Beep Beep! I found some formatting errors in this PR: \n"
+          var message;
+          if (process.env.EXIT_CODE === '0') {
+            message = 'Beep Beep! No formatting errors detected! :partying_face:'
+          } else {
+            message = 'Beep Beep! I found some formatting errors in this PR: \n'
+            message += ' \n``` \n' + process.env.OUTPUT + ' \n```'
+          }
           github.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: title + ' \n``` \n' + process.env.OUTPUT + ' \n```'
-          })
-    - if: steps.run_pycodestyle.outcome == 'success'
-      name: Comment (success)
-      uses: actions/github-script@v3
-      with:
-        github-token: ${{ secrets.OMEGA_ROBOT_TOKEN }}
-        script: |
-          github.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: 'Beep Beep! No formatting errors detected! :partying_face:'
+            body: message,
           })
