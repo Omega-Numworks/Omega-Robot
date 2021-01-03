@@ -18,8 +18,9 @@ actions = {
 
 
 class Fun(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot, config):
         self.bot = bot
+        self.config = config
 
     @commands.command(name="hug", aliases=list(actions.keys())[1:])
     async def action(self, ctx, member: discord.User):

@@ -17,7 +17,7 @@ bot = commands.Bot(command_prefix=config["PREFIX"])
 
 # Cogs load
 for cog in (Omega, Moderation, Fun):
-    bot.add_cog(cog(bot))
+    bot.add_cog(cog(bot, config))
 
 
 @bot.event
