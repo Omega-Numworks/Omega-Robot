@@ -1,7 +1,8 @@
+import aiohttp
+
 import discord
 from discord.ext import commands
 
-import aiohttp
 
 # Supported action commands with they template
 # {author} -> command author's mention
