@@ -1,11 +1,11 @@
-import discord
-from discord.ext import commands
-
 import aiohttp
 import asyncio
-import re
 from datetime import datetime
+import re
 from typing import AsyncGenerator
+
+import discord
+from discord.ext import commands
 
 
 async def get_github_issues(message: discord.Message) -> AsyncGenerator[dict, None]:

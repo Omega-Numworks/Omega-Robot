@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-from discord.ext import commands
 import json
+
+from discord.ext import commands
 
 from cogs.omega import Omega
 from cogs.moderation import Moderation
