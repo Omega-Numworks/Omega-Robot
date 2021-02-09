@@ -22,13 +22,13 @@ with open("config.json", "r") as file:
 
 
 class Bot(commands.Bot):
-    
+
     def __init__(self):
         super().__init__(config["PREFIX"])
 
         self.description = "A bot for two Omega Discord servers."
         self.token = config["TOKEN"]
-    
+
     async def on_ready(self):
         print(f"Bot {self.user.name} connected on {len(self.guilds)} servers")
 
