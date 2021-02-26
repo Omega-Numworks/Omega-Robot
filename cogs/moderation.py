@@ -9,14 +9,18 @@ class Moderation(commands.Cog):
         self.bot = bot
         self.config = config
 
+        # compile all patterns into a dictionary as form
+        # {channel_id: compiled_regex_pattern}
+        self.regex_patterns = {chan_id: re.compile(pattern)
+                               for chan_id, pattern in config["REGEX_CHANNELS"].items()}
+
     @commands.Cog.listener()
     async def on_message(self, message):
-        # check in the config if the message's channel
-        # is limited with a specific message format
-        pattern = self.config["REGEX_CHANNELS"].get(str(message.channel.id))
+        # check if the message's channel is limited with a specific message format
+        pattern = self.regex_patterns.get(str(message.channel.id))
         if pattern:
             # if the message doesn't match with the format, the bot deletes it
-            if not re.match(pattern, message.content):
+            if not pattern.match(message.content):
                 await message.delete()
 
     @commands.command(name="normalize")
@@ -28,6 +32,6 @@ class Moderation(commands.Cog):
 
         embed = discord.Embed(name="Normalization")
         embed.description = f"Nickname of {member.mention} has been changed to `{normalized_nickname}."
-        embed.color = int(self.config["EMBED_COLOR"], 16)
+        embed.colour = int(self.config["EMBED_COLOR"], 16)
 
         await ctx.send(embed=embed)
