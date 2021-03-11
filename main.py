@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+
+__version__ = "under developpement"
 
 import json
 
@@ -8,22 +9,37 @@ from cogs.omega import Omega
 from cogs.moderation import Moderation
 from cogs.fun import Fun
 
-__version__ = "under developpement"
 
-# Configuration
+extensions = (
+    Omega,
+    Moderation,
+    Fun
+)
+
+# Configuration.
 with open("config.json", "r") as file:
     config = json.load(file)
 
-bot = commands.Bot(command_prefix=config["PREFIX"])
 
-# Cogs load
-for cog in (Omega, Moderation, Fun):
-    bot.add_cog(cog(bot, config))
+class Bot(commands.Bot):
+
+    def __init__(self):
+        super().__init__(config["PREFIX"])
+
+        self.description = "A bot for two Omega Discord servers."
+        self.token = config["TOKEN"]
+
+    async def on_ready(self):
+        print(f"Bot {self.user.name} connected on {len(self.guilds)} servers")
+
+    def run(self):
+        # Cogs load.
+        for cog in extensions:
+            self.add_cog(cog(self, config))
+
+        super().run(self.token)
 
 
-@bot.event
-async def on_ready():
-    print(f"Bot {bot.user.name} connected on {len(bot.guilds)} servers")
-
-
-bot.run(config["TOKEN"])
+if __name__ == "__main__":
+    omega_robot = Bot()
+    omega_robot.run()
