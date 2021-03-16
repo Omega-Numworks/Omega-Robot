@@ -9,7 +9,7 @@ class Moderation(commands.Cog):
         self.bot = bot
         self.config = config
 
-        # compile all patterns into a dictionary as form
+        # Compile all patterns into a dictionary as form
         # {channel_id: compiled_regex_pattern}
         self.regex_patterns = {chan_id: re.compile(pattern)
                                for chan_id, pattern in config["REGEX_CHANNELS"].items()}
