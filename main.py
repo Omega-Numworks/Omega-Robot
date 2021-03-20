@@ -9,6 +9,8 @@ from cogs.omega import Omega
 from cogs.moderation import Moderation
 from cogs.fun import Fun
 
+from logs.logger import logger
+
 
 extensions = (
     Omega,
@@ -31,6 +33,17 @@ class Bot(commands.Bot):
 
     async def on_ready(self):
         print(f"Bot {self.user.name} connected on {len(self.guilds)} servers")
+
+    async def on_command(self, ctx):
+        args = ctx.args[2:]
+
+        if args:
+            args_text = f" with args {', '.join(str(arg) for arg in args)}"
+        else:
+            args_text = ""
+
+        text = f"{ctx.command.name} called by {ctx.author}{args_text}."
+        logger.info(text)
 
     def run(self):
         # Cogs load.
