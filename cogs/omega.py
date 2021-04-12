@@ -116,7 +116,7 @@ class Omega(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, reaction):
         # Ignore bots
-        if self.bot.get_user(reaction.user_id).bot:
+        if reaction.member.bot:
             return
 
         # If the reaction is "🗑️" and on a message stored in issue_embeds,

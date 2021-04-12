@@ -20,7 +20,7 @@ class Moderation(commands.Cog):
         pattern = self.regex_patterns.get(str(message.channel.id))
         if pattern:
             # if the message doesn't match with the format, the bot deletes it
-            if not pattern.match(message.content):
+            if not pattern.fullmatch(message.content):
                 await message.delete()
 
     @commands.command(name="normalize")
