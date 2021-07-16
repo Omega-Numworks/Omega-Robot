@@ -72,7 +72,7 @@ class Fun(commands.Cog):
         text = apod.find_all("p")[2].text
 
         embed = discord.Embed(title="Astronomy Picture of the Day", color="")
-        embed.description = "Each day a different image or photograph of our fascinating universe is featured, along with a brief explanation."
+        embed.description = "Each day a different image or photograph of our fascinating universe is featured"
 
         embed.set_image(img)
         embed.add_field(name="Explanation", value=text[18:])
