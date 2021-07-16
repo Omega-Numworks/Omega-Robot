@@ -2,8 +2,9 @@ import aiohttp
 import asyncio
 from datetime import datetime
 import re
-from typing import AsyncGenerator
 import requests
+from typing import AsyncGenerator
+
 
 import discord
 from discord.ext import commands
@@ -103,11 +104,11 @@ class Omega(commands.Cog):
         if re.match("^#([A-Fa-f0-9]{6})$", message.content):
             # Removes the '#'
             hex_code = message.content[1:]
-            x = requests.get('https://www.thecolorapi.com/id?hex=' + hex_code).json()
-            title = x['name']['value']
-            img = x['image']['bare']
-            rgb = x['rgb']['value']
-            embed = Embed(title='Color #' + title + rgb, color='0x' + hex_code)
+            req = requests.get('https://www.thecolorapi.com/id?hex=' + hex_code).json()
+            title = req['name']['value']
+            img = req['image']['bare']
+            rgb = req['rgb']['value']
+            embed = Embed(title=f"Color #{title}{rgb}", color=f"0x{hex_code}")
             embed.set_image(img)
             hex_embed = await message.channel.send(embed=embed)
 
