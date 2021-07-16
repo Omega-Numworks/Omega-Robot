@@ -1,5 +1,8 @@
 import aiohttp
 
+import requests
+from bs4 import BeautilfulSoup
+
 import discord
 from discord.ext import commands
 
@@ -55,3 +58,24 @@ class Fun(commands.Cog):
             embed.description = f"Aww, I see you are lonely, I will {ctx.invoked_with} you"
 
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def apod(self, ctx):
+        """
+        This command requests the APOD (image and text)
+        """
+
+        apod = requests.get("https://apod.nasa.gov/apod/astropix.html").text
+        apod = BeautilfulSoup(apod, features="html5lib")
+
+        img = f"https://apod.nasa.gov/apod/{apod.find_all("img")[0]["src"]}"
+        text = apod.find_all("p")[2].text
+
+        embed = discord.Embed(title="Astronomy Picture of the Day", color="")
+        embed.description = "Each day a different image or photograph of our fascinating universe is featured, along with a brief explanation written by a professional astronomer."
+
+        embed.set_image(img)
+        embed.add_field(name="Explanation", value=text[18:])
+
+        await ctx.send(embed=embed)
+
