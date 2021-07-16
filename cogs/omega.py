@@ -103,7 +103,7 @@ class Omega(commands.Cog):
         if re.match("^#([A-Fa-f0-9]{6})$", message.content):
             # Removes the '#'
             hex_code = message.content[1:]
-            x = requests.get('https://www.thecolorapi.com/id?hex='+ hex_code).json()
+            x = requests.get('https://www.thecolorapi.com/id?hex=' + hex_code).json()
             title = x['name']['value']
             img = x['image']['bare']
             rgb = x['rgb']['value']
