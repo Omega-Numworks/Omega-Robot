@@ -101,7 +101,7 @@ class Omega(commands.Cog):
 
         # Checks if the message is an hex code
         if re.match("^#([A-Fa-f0-9]{6})$", message.content):
-            #Removes the '#'
+            # Removes the '#'
             hex_code = message.content[1:]
             x = requests.get('https://www.thecolorapi.com/id?hex='+ hex_code).json()
             title = x['name']['value']
