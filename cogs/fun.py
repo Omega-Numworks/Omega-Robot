@@ -78,4 +78,3 @@ class Fun(commands.Cog):
         embed.add_field(name="Explanation", value=text[18:])
 
         await ctx.send(embed=embed)
-
