@@ -99,7 +99,7 @@ class Omega(commands.Cog):
         if message.author.bot:
             return
 
-        #Checks if the message is an hex code
+        # Checks if the message is an hex code
         if re.match("^#([A-Fa-f0-9]{6})$", message.content):
             #Removes the '#'
             hex_code = message.content[1:]
