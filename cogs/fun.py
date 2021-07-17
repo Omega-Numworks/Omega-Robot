@@ -65,7 +65,7 @@ class Fun(commands.Cog):
         """
         embed = discord.Embed(title="Astronomy Picture of the Day", color="")
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://apod.nasa.gov/apod/astropix.html") as r:
+            async with session.get("https://apod.nasa.gov/apod/astropix.html") as r:
                 if r.status == 200:
                     apod = await r.text
                 else:
