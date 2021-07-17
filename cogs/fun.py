@@ -106,7 +106,7 @@ class Fun(commands.Cog):
         # Store msg if msg was sent in DM and turn on "confirm mode"
         if not message.guild:
             # Check if one or more emojis are in the msg content
-            emoji_in_msg = bool(re.compile(r"<a?:.+?:\d+>|<:.+?:\d+>").search(message.content))
+            emoji_in_msg = bool(re.search(r"<a?:.+?:\d+>|<:.+?:\d+>", message.content))
             for str in list(message.content):
                 emoji_in_msg += str in UNICODE_EMOJI["en"]
             emoji_in_msg = bool(emoji_in_msg)
