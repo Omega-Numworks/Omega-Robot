@@ -7,6 +7,8 @@ from typing import AsyncGenerator
 import discord
 from discord.ext import commands
 
+from src.utils import user_only
+
 
 async def get_github_issues(message: discord.Message) -> AsyncGenerator[dict, None]:
     """Asynchronous generator that returns information on each issue,
@@ -93,11 +95,8 @@ class Omega(commands.Cog):
         self.issue_embeds = {}
 
     @commands.Cog.listener()
+    @user_only()
     async def on_message(self, message):
-        # Ignore bots
-        if message.author.bot:
-            return
-
         # Check if the message has an issue identifier in it
         if re.search("(^| )#[0-9]+e?($| )", message.content):
             async for i in get_github_issues(message):
