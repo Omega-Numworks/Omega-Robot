@@ -64,7 +64,6 @@ class Fun(commands.Cog):
         """
         This command requests the APOD (image and text).
         """
-
         apod = requests.get("https://apod.nasa.gov/apod/astropix.html").text
         apod = BeautilfulSoup(apod, features="html5lib")
 
