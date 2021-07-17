@@ -5,6 +5,10 @@ from bs4 import BeautilfulSoup
 import discord
 from discord.ext import commands
 
+from emoji import UNICODE_EMOJI
+
+import re
+
 
 # Supported action commands with they template
 # {author} -> command author's mention
@@ -101,9 +105,18 @@ class Fun(commands.Cog):
 
         # Store msg if msg was sent in DM and turn on "confirm mode"
         if not message.guild:
-            self.confession_is_confirm_e = True
-            self.confession_msg = message
-            await message.channel.send("React to this message to send it to the confession channel")
+            # Check if one or more emojis are in the msg content
+            emoji_in_msg = bool(re.compile(r"<a?:.+?:\d+>|<:.+?:\d+>").search(message.content))
+            for str in list(message.content):
+                emoji_in_msg += str in UNICODE_EMOJI["en"]
+            emoji_in_msg = bool(emoji_in_msg)
+
+            if emoji_in_msg:
+                await message.channel.send("Please don't use any emojis in your confession")
+            else:
+                self.confession_is_confirm_e = True
+                self.confession_msg = message
+                await message.channel.send("React to this message to send it to the confession channel")
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, reaction):
