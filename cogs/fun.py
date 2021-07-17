@@ -55,3 +55,43 @@ class Fun(commands.Cog):
             embed.description = f"Aww, I see you are lonely, I will {ctx.invoked_with} you"
 
         await ctx.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        # Turn off "confirm mode"
+        self.confession_is_confirm_e = False
+
+        # Ignore bots
+        if message.author.bot:
+            return
+
+        # Check if Confession is enabled
+        if not self.config["CONFESSION"]["ENABLED"]:
+            await message.channel.send("Confession not enabled")
+            return
+
+        # Store msg if msg was sent in DM and turn on "confirm mode"
+        if not message.guild:
+            self.confession_is_confirm_e = True
+            self.confession_msg = message
+            await message.channel.send("React to this message to send it to the confession channel")
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, reaction):
+        reaction_user = await self.bot.fetch_user(reaction.user_id)
+        reaction_channel = await self.bot.fetch_channel(reaction.channel_id)
+        confession_channel = await self.bot.fetch_channel(self.config["CONFESSION"]["CHANNEL"])
+        user_in_chan_guild = await confession_channel.guild.fetch_member(reaction.user_id)
+
+        # Ignore bots
+        if reaction_user.bot:
+            return
+
+        # Check if "confirm mode" is enabled
+        if not self.confession_is_confirm_e:
+            return
+
+        # If reaction is in DM and user is present in confession channel, send msg
+        if reaction_channel.type.name == "private" and user_in_chan_guild is not None:
+            self.confession_is_confirm_e = False
+            await confession_channel.send(self.confession_msg.content)
