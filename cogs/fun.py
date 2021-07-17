@@ -62,7 +62,7 @@ class Fun(commands.Cog):
     @commands.command()
     async def apod(self, ctx):
         """
-        This command requests the APOD (image and text)
+        This command requests the APOD (image and text).
         """
 
         apod = requests.get("https://apod.nasa.gov/apod/astropix.html").text
