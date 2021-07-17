@@ -1,7 +1,6 @@
 import aiohttp
 
 from bs4 import BeautilfulSoup
-import requests
 
 import discord
 from discord.ext import commands
@@ -74,13 +73,13 @@ class Fun(commands.Cog):
                     embed.description = "Sorry, a problem has occurred when trying to interact with the apod website"
                     return await ctx.send(embed=embed)
 
+        # Collect informations
         apod = BeautilfulSoup(apod, features="html5lib")
-
         img = f"https://apod.nasa.gov/apod/{apod.find_all("img")[0]["src"]}"
         text = apod.find_all("p")[2].text
 
+        # Make the embed
         embed.description = "Each day a different image or photograph of our fascinating universe is featured."
-
         embed.set_image(img)
         embed.add_field(name="Explanation", value=text[18:])
 
