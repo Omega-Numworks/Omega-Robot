@@ -39,7 +39,7 @@ class Bot(commands.Bot):
         args = msg.args[2:]
 
         if args:
-            args_info= f" with args {', '.join(repr(arg) for arg in args)}"
+            args_info = f" with args {', '.join(repr(arg) for arg in args)}"
         else:
             args_info = ""
 
