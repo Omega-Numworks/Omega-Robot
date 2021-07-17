@@ -36,21 +36,21 @@ class Fun(commands.Cog):
         embed = discord.Embed()
         embed.set_footer(text="powered by nekos.life")
 
-        # Make a request to the nekos.life api at the command's name endpoint
+        # Make a request to the nekos.life api at the command's name endpoint.
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://nekos.life/api/v2/img/{ctx.invoked_with}") as r:
                 if r.status == 200:
                     data = await r.json()
                 else:
-                    # If the request status is not 200, send an error embed
+                    # If the request status is not 200, send an error embed.
                     embed.title = "API error"
                     embed.description = "Sorry, a problem has occurred when trying to interact with the nekos.life API"
                     return await ctx.send(embed=embed)
 
-        # Place the nekos.life's gif in the embed
+        # Place the nekos.life's gif in the embed.
         embed.set_image(url=data["url"])
 
-        # Make a custom message based on the command's template message
+        # Make a custom message based on the command's template message.
         if ctx.author.id != member.id:
             embed.description = actions[ctx.invoked_with].format(author=ctx.author.name, target=member.name)
         else:
@@ -69,16 +69,16 @@ class Fun(commands.Cog):
                 if r.status == 200:
                     apod = await r.text
                 else:
-                    # If the request status is not 200, send an error embed
+                    # If the request status is not 200, send an error embed.
                     embed.description = "Sorry, a problem has occurred when trying to interact with the apod website"
                     return await ctx.send(embed=embed)
 
-        # Collect informations
+        # Collect informations.
         apod = BeautilfulSoup(apod, features="html5lib")
         img = f"https://apod.nasa.gov/apod/{apod.find_all("img")[0]["src"]}"
         text = apod.find_all("p")[2].text
 
-        # Make the embed
+        # Make the embed.
         embed.description = "Each day a different image or photograph of our fascinating universe is featured."
         embed.set_image(img)
         embed.add_field(name="Explanation", value=text[18:])
