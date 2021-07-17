@@ -116,13 +116,13 @@ class Omega(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, reaction):
         # Ignore bots
-        if self.bot.get_user(reaction.user_id).bot:
+        reaction_user = await self.bot.fetch_user(reaction.user_id)
+        if reaction_user.bot:
             return
 
         # If the reaction is "🗑️" and on a message stored in issue_embeds,
-        # it deletes it and set it deleted in the storage dictionary
-        if reaction.emoji.name == "🗑️" and self.issue_embeds.get(reaction.message_id):
+        # it deletes it on discord and in the storage dictionary
+        if reaction.emoji.name == "🗑️" and self.issue_embeds.pop(reaction.message_id, None):
             channel = self.bot.get_channel(reaction.channel_id)
             message = await channel.fetch_message(reaction.message_id)
             await message.delete()
-            self.issue_embeds[reaction.message_id] = 0
