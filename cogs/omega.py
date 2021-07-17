@@ -95,22 +95,22 @@ class Omega(commands.Cog):
         self.issue_embeds = {}
 
     @commands.Cog.listener()
+    @user_only()
     async def on_message(self, message):
-        # Ignore bots
-        if message.author.bot:
-            return
-
         # Checks if the message is an hex code
         if re.match("^#([A-Fa-f0-9]{6})$", message.content):
-            # Removes the '#'
+            # Removes "#".
             hex_code = message.content[1:]
-            req = requests.get('https://www.thecolorapi.com/id?hex=' + hex_code).json()
-            title = req['name']['value']
-            img = req['image']['bare']
-            rgb = req['rgb']['value']
+
+            req = requests.get("https://www.thecolorapi.com/id?hex=" + hex_code).json()
+            title = req["name"]["value"]
+            img = req["image"]["bare"]
+            rgb = req["rgb"]["value"]
+
             embed = Embed(title=f"Color #{title}{rgb}", color=f"0x{hex_code}")
             embed.set_image(img)
-            hex_embed = await message.channel.send(embed=embed)
+            
+            await message.send(embed=embed)
 
         # Check if the message has an issue identifier in it
         if re.search("(^| )#[0-9]+e?($| )", message.content):
