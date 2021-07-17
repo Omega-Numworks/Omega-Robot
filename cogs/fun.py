@@ -1,7 +1,7 @@
 import aiohttp
 
-import requests
 from bs4 import BeautilfulSoup
+import requests
 
 import discord
 from discord.ext import commands
