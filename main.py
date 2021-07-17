@@ -38,10 +38,8 @@ class Bot(commands.Bot):
         """
         args = msg.args[2:]
 
-        if args:
-            args_info = f" with args {', '.join(repr(arg) for arg in args)}"
-        else:
-            args_info = ""
+        args_info = (f" with args {', '.join(repr(arg) for arg in args)}"
+                     if args else "")
 
         log_msg = f"{msg.command.name} called by {msg.author}{args_info}."
         logger.info(log_msg)
