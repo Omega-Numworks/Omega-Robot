@@ -112,15 +112,21 @@ class Fun(commands.Cog):
         confession_channel = await self.bot.fetch_channel(self.config["CONFESSION"]["CHANNEL"])
         user_in_chan_guild = await confession_channel.guild.fetch_member(reaction.user_id)
 
+        try:
+            last_confession_msg = await confession_channel.fetch_message(confession_channel.last_message_id)
+            new_count = int(last_confession_msg.content.split(":")[0]) + 1
+        except discord.errors.NotFound:
+            new_count = 1
+
         # Ignore bots
         if reaction_user.bot:
             return
 
         # Check if "confirm mode" is enabled
-        if not self.confession_is_confirm_e:
+        if self.confession_is_confirm_e:
             return
 
         # If reaction is in DM and user is present in confession channel, send msg
         if reaction_channel.type.name == "private" and user_in_chan_guild is not None:
             self.confession_is_confirm_e = False
-            await confession_channel.send(self.confession_msg.content)
+            await confession_channel.send(f"{new_count}: {self.confession_msg.content}")
