@@ -126,6 +126,10 @@ class Fun(commands.Cog):
         if self.confession_is_confirm_e:
             return
 
+        # Check if user id is the same as author id
+        if self.confession_msg.author.id != reaction_user.id:
+            return
+
         # If reaction is in DM and user is present in confession channel, send msg
         if reaction_channel.type.name == "private" and user_in_chan_guild is not None:
             self.confession_is_confirm_e = False
