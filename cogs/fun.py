@@ -46,7 +46,7 @@ class Fun(commands.Cog):
                     # If the request status is not 200, send an error embed
                     embed.title = "API error"
                     embed.description = "Sorry, a problem has occurred when trying to interact with the nekos.life API"
-                    return await ctx.send(embed)
+                    return await ctx.send(embed=embed)
 
         # Place the nekos.life's gif in the embed
         embed.set_image(url=data["url"])
@@ -64,13 +64,21 @@ class Fun(commands.Cog):
         """
         This command requests the APOD (image and text).
         """
-        apod = requests.get("https://apod.nasa.gov/apod/astropix.html").text
+        embed = discord.Embed(title="Astronomy Picture of the Day", color="")
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://apod.nasa.gov/apod/astropix.html") as r:
+                if r.status == 200:
+                    apod = await r.text
+                else:
+                    # If the request status is not 200, send an error embed
+                    embed.description = "Sorry, a problem has occurred when trying to interact with the apod website"
+                    return await ctx.send(embed=embed)
+
         apod = BeautilfulSoup(apod, features="html5lib")
 
         img = f"https://apod.nasa.gov/apod/{apod.find_all("img")[0]["src"]}"
         text = apod.find_all("p")[2].text
 
-        embed = discord.Embed(title="Astronomy Picture of the Day", color="")
         embed.description = "Each day a different image or photograph of our fascinating universe is featured."
 
         embed.set_image(img)
