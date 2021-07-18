@@ -88,6 +88,26 @@ async def make_embed(data: dict) -> discord.Embed:
     return embed
 
 
+async def make_color_embed(hex_code: int) -> discord.Embed:
+    """Return a ``discord.Embed`` contains some informations about color
+    of given ``hex_code``.
+    """
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://www.thecolorapi.com/id?hex={hex_code}") as r:
+            if r.status == 200:
+                data = await r.json()
+            else:
+                return await message.channel.send("Erreur lors de la requête "
+                                                  f"({r.status})")
+
+    title = data["name"]["value"]
+    description = "\n".join("**{}:** {} {} {}".format(color_format.upper(), *[data[color_format][letter] for letter in tuple(color_format)]) for color_format in ("rgb", "hsl", "hsv"))
+
+    return discord.Embed(title=f"{title} color",
+                         description=description,
+                         color=int(hex_code, base=16))
+
+
 class Omega(commands.Cog):
     def __init__(self, bot, config):
         self.bot = bot
@@ -95,22 +115,14 @@ class Omega(commands.Cog):
         self.issue_embeds = {}
 
     @commands.Cog.listener()
-    @user_only()
+    # @user_only()
     async def on_message(self, message):
         # Checks if the message is an hex code
         if re.match("^#([A-Fa-f0-9]{6})$", message.content):
-            # Removes "#".
-            hex_code = message.content[1:]
+            hex_code = message.content.lstrip("#")
+            color_embed = await make_color_embed(hex_code)
 
-            req = requests.get("https://www.thecolorapi.com/id?hex=" + hex_code).json()
-            title = req["name"]["value"]
-            img = req["image"]["bare"]
-            rgb = req["rgb"]["value"]
-
-            embed = Embed(title=f"Color #{title}{rgb}", color=f"0x{hex_code}")
-            embed.set_image(img)
-            
-            await message.send(embed=embed)
+            await message.channel.send(embed=color_embed)
 
         # Check if the message has an issue identifier in it
         if re.search("(^| )#[0-9]+e?($| )", message.content):
