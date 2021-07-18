@@ -1,6 +1,6 @@
 import aiohttp
 
-from bs4 import BeautilfulSoup
+from bs4 import BeautifulSoup
 
 import discord
 from discord.ext import commands
@@ -67,25 +67,31 @@ class Fun(commands.Cog):
         """
         This command requests the APOD (image and text).
         """
-        embed = discord.Embed(title="Astronomy Picture of the Day", color="")
+        embed = discord.Embed(title="Astronomy Picture of the Day")
         async with aiohttp.ClientSession() as session:
-            async with session.get("https://apod.nasa.gov/apod/astropix.html") as r:
-                if r.status == 200:
-                    apod = await r.text
+            async with session.get("https://apod.nasa.gov/apod/") as response:
+                if response.status == 200:
+                    apod = await response.text()
                 else:
                     # If the request status is not 200, send an error embed.
                     embed.description = "Sorry, a problem has occurred when trying to interact with the apod website"
                     return await ctx.send(embed=embed)
 
         # Collect informations.
-        apod = BeautilfulSoup(apod, features="html5lib")
-        img = f"https://apod.nasa.gov/apod/{apod.find_all("img")[0]["src"]}"
-        text = apod.find_all("p")[2].text
+        soup = BeautifulSoup(apod, "html.parser")
+        img_url = f"https://apod.nasa.gov/apod/{soup.find('img')['src']}"
+
+        # Get the description and sanitizes it.
+        text = ""
+        for node in soup.find_all("p")[2]:
+            if node.name == "p":
+                break
+            text += node.string.replace("\n", " ")
+        text = text.replace('  ', ' ')
 
         # Make the embed.
-        embed.description = "Each day a different image or photograph of our fascinating universe is featured."
-        embed.set_image(img)
-        embed.add_field(name="Explanation", value=text[18:])
+        embed.description = f"**{soup.find('b').string}**\n{text[13:]}"
+        embed.set_image(url=img_url)
 
         await ctx.send(embed=embed)
 

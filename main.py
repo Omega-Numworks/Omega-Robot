@@ -41,7 +41,7 @@ class Bot(commands.Bot):
         args_info = ', '.join(repr(arg) for arg in args) if args else ""
 
         log_msg = (f"{msg.command.name} called by {msg.author} with "
-                   "args {args_info}.")
+                   f"args {args_info}.")
         logger.info(log_msg)
 
     async def on_message_delete(self, msg):
