@@ -9,11 +9,14 @@ jobs:
     - uses: actions/checkout@master
       with:
         ref: ${{ github.event.pull_request.head.sha }}
+    - name: 'Install deps'
+      run: |
+        pip install pylint
+        pip install -r requirements.pip
     - name: 'Run PEP8'
-      uses: quentinguidee/pep8-action@v1
       id: run_pep8
-      with:
-        arguments: '--max-line-length=120'
+      run: |
+        pylint **/*.py
       continue-on-error: true
     - name: 'Comment'
       uses: actions/github-script@v3
