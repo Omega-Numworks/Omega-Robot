@@ -1,8 +1,5 @@
-discord.py
-discord
-bs4
-emoji
 aiohttp
-datetime
-typing
 asyncio
+bs4
+discord
+emoji
