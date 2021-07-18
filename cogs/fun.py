@@ -31,6 +31,9 @@ class Fun(commands.Cog):
         self.bot = bot
         self.config = config
 
+        self.regex_patterns = {chan_id: re.compile(pattern)
+                               for chan_id, pattern in config["REGEX_CHANNELS"].items()}
+
     @commands.command(name="hug", aliases=list(actions.keys())[1:])
     @user_only()
     async def action(self, ctx, member: discord.User):
@@ -106,11 +109,13 @@ class Fun(commands.Cog):
 
         # Store msg if msg was sent in DM and turn on "confirm mode"
         if not message.guild:
-            # Check if one or more emojis are in the msg content
-            emoji_in_msg = bool(re.search(r"<a?:.+?:\d+>|<:.+?:\d+>|:[a-z_]+:", message.content))
+            pattern = self.regex_patterns.get(str(message.channel.id))
 
-            emoji_in_msg = sum(char in UNICODE_EMOJI["en"]
-                               for char in message.content)
+            # Check if one or more emojis are in the msg content
+            emoji_in_msg = bool(re.search(pattern, message.content))
+
+            emoji_in_msg += sum(char in UNICODE_EMOJI["en"]
+                                for char in message.content)
 
             if emoji_in_msg:
                 await message.channel.send("Please don't use any emojis in "
