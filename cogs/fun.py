@@ -9,6 +9,8 @@ from emoji import UNICODE_EMOJI
 
 import re
 
+from src.utils import user_only
+
 
 # Supported action commands with they template
 # {author} -> command author's mention
@@ -30,6 +32,7 @@ class Fun(commands.Cog):
         self.config = config
 
     @commands.command(name="hug", aliases=list(actions.keys())[1:])
+    @user_only()
     async def action(self, ctx, member: discord.User):
         """A command that regroups all actions commands
 
@@ -63,6 +66,7 @@ class Fun(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
+    @user_only()
     async def apod(self, ctx):
         """
         This command requests the APOD (image and text).
@@ -90,13 +94,10 @@ class Fun(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.Cog.listener()
+    @user_only()
     async def on_message(self, message):
         # Turn off "confirm mode"
         self.confession_is_confirm_e = False
-
-        # Ignore bots
-        if message.author.bot:
-            return
 
         # Check if Confession is enabled
         if not self.config["CONFESSION"]["ENABLED"]:
