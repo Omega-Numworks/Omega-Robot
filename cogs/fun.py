@@ -31,6 +31,9 @@ class Fun(commands.Cog):
         self.bot = bot
         self.config = config
 
+        self.regex_patterns = {chan_id: re.compile(pattern)
+                               for chan_id, pattern in config["REGEX_CHANNELS"].items()}
+
     @commands.command(name="hug", aliases=list(actions.keys())[1:])
     @user_only()
     async def action(self, ctx, member: discord.User):
@@ -103,7 +106,7 @@ class Fun(commands.Cog):
     @user_only()
     async def on_message(self, message):
         # Turn off "confirm mode"
-        self.confession_is_confirm_e = False
+        self.confession_confirm_mode = False
 
         # Check if Confession is enabled
         if not self.config["CONFESSION"]["ENABLED"]:
@@ -112,18 +115,22 @@ class Fun(commands.Cog):
 
         # Store msg if msg was sent in DM and turn on "confirm mode"
         if not message.guild:
+            pattern = self.regex_patterns.get(str(message.channel.id))
+
             # Check if one or more emojis are in the msg content
-            emoji_in_msg = bool(re.search(r"<a?:.+?:\d+>|<:.+?:\d+>|:[a-z_]+:", message.content))
-            for string in list(message.content):
-                emoji_in_msg += string in UNICODE_EMOJI["en"]
-            emoji_in_msg = bool(emoji_in_msg)
+            emoji_in_msg = bool(re.search(pattern, message.content))
+
+            emoji_in_msg += sum(char in UNICODE_EMOJI["en"]
+                                for char in message.content)
 
             if emoji_in_msg:
-                await message.channel.send("Please don't use any emojis in your confession")
+                await message.channel.send("Please don't use any emojis in "
+                                           "your confession")
             else:
-                self.confession_is_confirm_e = True
+                self.confession_confirm_mode = True
                 self.confession_msg = message
-                await message.channel.send("React to this message to send it to the confession channel")
+                await message.channel.send("React to this message to send it "
+                                           "to the confession channel")
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, reaction):
@@ -138,19 +145,12 @@ class Fun(commands.Cog):
         except discord.errors.NotFound:
             new_count = 1
 
-        # Ignore bots
-        if reaction_user.bot:
-            return
-
-        # Check if "confirm mode" is enabled
-        if self.confession_is_confirm_e:
-            return
-
-        # Check if user id is the same as author id
-        if self.confession_msg.author.id != reaction_user.id:
+        if (reaction_user.bot  # Ignore bots
+            or self.confession_confirm_mode
+            or self.confession_msg.author.id != reaction_user.id):
             return
 
         # If reaction is in DM and user is present in confession channel, send msg
         if reaction_channel.type.name == "private" and user_in_chan_guild is not None:
-            self.confession_is_confirm_e = False
+            self.confession_confirm_mode = False
             await confession_channel.send(f"{new_count}: {self.confession_msg.content}")
