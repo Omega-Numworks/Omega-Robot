@@ -109,23 +109,23 @@ class Fun(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    # @commands.Cog.listener()
-    # @user_only()
-    # async def on_message(self, message):
-    #     """"Decide to store message and send a confirm message."""
-    #     self.confession_is_confirm_e = False
+    @commands.Cog.listener()
+    @user_only()
+    async def on_message(self, message):
+        """"Decide to store message and send a confirm message."""
+        self.confession_is_confirm_e = False
 
-    #     # Check if Confession is enabled.
-    #     if not self.config["CONFESSION"]["ENABLED"]:
-    #         await message.channel.send("Confession not enabled")
-    #         return
+        # Check if Confession is enabled.
+        if not self.config["CONFESSION"]["ENABLED"]:
+            await message.channel.send("Confession not enabled")
+            return
 
-    #     # Store msg if msg was sent in DM and turn on "confirm mode".
-    #     if not message.guild:
-    #         self.confession_is_confirm_e = True
-    #         self.confession_msg = message
-    #         await message.channel.send("React to this message to send it to "
-    #                                    "the confession channel")
+        # Store msg if msg was sent in DM and turn on "confirm mode".
+        if not message.guild:
+            self.confession_is_confirm_e = True
+            self.confession_msg = message
+            await message.channel.send("React to this message to send it to "
+                                       "the confession channel")
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, reaction):
