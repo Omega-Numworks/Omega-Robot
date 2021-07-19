@@ -100,8 +100,9 @@ async def make_color_embed(hex_code: int) -> discord.Embed:
                 return await message.channel.send("Erreur lors de la requête "
                                                   f"({r.status})")
 
-    title = f"{data["name"]["value"]} color"
-    description = "\n".join("**{}:** {} {} {}".format(color_format.upper(), *[data[color_format][letter] for letter in tuple(color_format)]) for color_format in ("rgb", "hsl", "hsv"))
+    title = f"{data['name']['value']} color"
+    description = f"**Hex:** #{hex_code}\n"
+    description += "\n".join("**{}:** {}, {}, {}".format(color_format.capitalize(), *[data[color_format][letter] for letter in tuple(color_format)]) for color_format in ("rgb", "hsl", "hsv"))
 
     return discord.Embed(title=title,
                          description=description,
