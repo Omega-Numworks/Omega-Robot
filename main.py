@@ -7,7 +7,7 @@ from discord.ext import commands
 
 from cogs.omega import Omega
 from cogs.moderation import Moderation
-from cogs.fun import Fun
+from cogs.fun import Fun, Confession
 from logs.logger import logger
 
 
@@ -22,6 +22,10 @@ class Bot(commands.Bot):
         Moderation,
         Omega
     )
+
+    optionals = {
+        Confession: config["CONFESSION"]["ENABLED"]
+    }
 
     def __init__(self):
         super().__init__(config["PREFIX"])
@@ -56,6 +60,10 @@ class Bot(commands.Bot):
         """Start the bot and load one by one available cogs."""
         for cog in self.extensions:
             self.add_cog(cog(self, config))
+
+        for cog, requirement in self.optionals.items():
+            if requirement:
+                self.add_cog(cog(self, config))
 
         super().run(self.token)
 

@@ -1,3 +1,6 @@
+import asyncio
+import re
+
 import aiohttp
 
 from bs4 import BeautifulSoup
@@ -6,8 +9,6 @@ import discord
 from discord.ext import commands
 
 from emoji import UNICODE_EMOJI
-
-import re
 
 from src.utils import user_only
 
@@ -31,9 +32,6 @@ class Fun(commands.Cog):
         self.bot = bot
         self.config = config
 
-        self.regex_patterns = {chan_id: re.compile(pattern)
-                               for chan_id, pattern in config["REGEX_CHANNELS"].items()}
-
     @commands.command(name="hug", aliases=list(actions.keys())[1:])
     @user_only()
     async def action(self, ctx, member: discord.User):
@@ -48,9 +46,9 @@ class Fun(commands.Cog):
 
         # Make a request to the nekos.life api at the command's name endpoint.
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://nekos.life/api/v2/img/{ctx.invoked_with}") as r:
-                if r.status == 200:
-                    data = await r.json()
+            async with session.get(f"https://nekos.life/api/v2/img/{ctx.invoked_with}") as response:
+                if response.status == 200:
+                    data = await response.json()
                 else:
                     # If the request status is not 200, send an error embed.
                     embed.title = "API error"
@@ -102,55 +100,68 @@ class Fun(commands.Cog):
 
         await ctx.send(embed=embed)
 
+
+class Confession(commands.Cog):
+    """Cog dedicated to the confession feature."""
+
+    def __init__(self, bot, config):
+        self.bot = bot
+        self.config = config
+
+        self.confession_queue = {}
+
     @commands.Cog.listener()
     @user_only()
     async def on_message(self, message):
-        # Turn off "confirm mode"
-        self.confession_confirm_mode = False
 
-        # Check if Confession is enabled
-        if not self.config["CONFESSION"]["ENABLED"]:
-            await message.channel.send("Confession not enabled")
+        # Check if msg was sent in DM by a user
+        if not isinstance(message.channel, discord.DMChannel) or message.author.bot:
             return
 
-        # Store msg if msg was sent in DM and turn on "confirm mode"
-        if not message.guild:
-            pattern = self.regex_patterns.get(str(message.channel.id))
+        # Check if one or more emojis are in the msg content
+        pattern = "<a?:.+?:\\d+>|<:.+?:\\d+>|:[a-z_]+:"
+        emoji_in_msg = bool(re.search(pattern, message.content))
 
-            # Check if one or more emojis are in the msg content
-            emoji_in_msg = bool(re.search(pattern, message.content))
+        emoji_in_msg |= any(char in UNICODE_EMOJI["en"]
+                            for char in message.content)
+        if emoji_in_msg:
+            return await message.channel.send("Please don't use any emojis in "
+                                              "your confession")
 
-            emoji_in_msg += sum(char in UNICODE_EMOJI["en"]
-                                for char in message.content)
+        # Send a confirm message, store it as pending in the queue until it gets reacted
+        confirm_message = await message.channel.send("React to this message to send it "
+                                                     "to the confession channel")
+        await confirm_message.add_reaction("✅")
+        self.confession_queue[confirm_message.id] = message.content
 
-            if emoji_in_msg:
-                await message.channel.send("Please don't use any emojis in "
-                                           "your confession")
-            else:
-                self.confession_confirm_mode = True
-                self.confession_msg = message
-                await message.channel.send("React to this message to send it "
-                                           "to the confession channel")
+        # After 30 secondes, the message is removed from the queue
+        await asyncio.sleep(30)
+        self.confession_queue.pop()
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, reaction):
-        reaction_user = await self.bot.fetch_user(reaction.user_id)
-        reaction_channel = await self.bot.fetch_channel(reaction.channel_id)
+        # Ignore himself
+        if reaction.user_id == self.bot.user.id:
+            return
+
+        # Check if the message is in the pending confessions
+        # and store the confession message if so
+        confession_msg = self.confession_queue.pop(reaction.message_id, None)
+        if not confession_msg:
+            return
+
+        # Check that user is present in confession channel
         confession_channel = await self.bot.fetch_channel(self.config["CONFESSION"]["CHANNEL"])
         user_in_chan_guild = await confession_channel.guild.fetch_member(reaction.user_id)
+        if user_in_chan_guild is None:
+            return
 
+        # Get confession number
         try:
-            last_confession_msg = await confession_channel.fetch_message(confession_channel.last_message_id)
-            new_count = int(last_confession_msg.content.split(":")[0]) + 1
+            last_confession = await confession_channel.fetch_message(confession_channel.last_message_id)
+            new_count = int(last_confession.content.split(":")[0]) + 1
         except discord.errors.NotFound:
             new_count = 1
 
-        if (reaction_user.bot  # Ignore bots
-            or self.confession_confirm_mode
-            or self.confession_msg.author.id != reaction_user.id):
-            return
-
-        # If reaction is in DM and user is present in confession channel, send msg
-        if reaction_channel.type.name == "private" and user_in_chan_guild is not None:
-            self.confession_confirm_mode = False
-            await confession_channel.send(f"{new_count}: {self.confession_msg.content}")
+        # Send the confession in the appropriate channel
+        await confession_channel.send(f"{new_count}: {confession_msg}")
