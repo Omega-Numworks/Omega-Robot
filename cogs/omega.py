@@ -109,9 +109,12 @@ async def make_color_embed(hex_code: int) -> discord.Embed:
           for letter in tuple(color_format)])
               for color_format in ("rgb", "hsl", "hsv"))
 
+    thumbnail = data["image"]["bare"]
+
     return discord.Embed(title=title,
                          description=description,
-                         color=int(hex_code, base=16))
+                         color=int(hex_code, base=16),
+                         thumbnail=thumbnail)
 
 
 class Omega(commands.Cog):
