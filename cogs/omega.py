@@ -107,8 +107,8 @@ async def make_color_embed(hex_code: int) -> discord.Embed:
     description += "\n".join("**{}:** {}, {}, {}".format(
         color_format.capitalize(),
         *[data[color_format][letter]
-              for letter in tuple(color_format)])
-                 for color_format in ("rgb", "hsl", "hsv"))
+          for letter in tuple(color_format)])
+              for color_format in ("rgb", "hsl", "hsv"))
 
     return discord.Embed(title=title,
                          description=description,
@@ -124,7 +124,6 @@ class Omega(commands.Cog):
     @commands.Cog.listener()
     @user_only()
     async def on_message(self, message):
-
         # Checks if the message is an hex code
         if re.match("^#([A-Fa-f0-9]{6})$", message.content):
             hex_code = message.content.lstrip("#")
