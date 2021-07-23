@@ -2,7 +2,9 @@ import aiohttp
 import asyncio
 from datetime import datetime
 import re
+import requests
 from typing import AsyncGenerator
+
 
 import discord
 from discord.ext import commands
@@ -88,6 +90,31 @@ async def make_embed(data: dict) -> discord.Embed:
     return embed
 
 
+async def make_color_embed(hex_code: int) -> discord.Embed:
+    """Return a ``discord.Embed`` contains some informations about color
+    of given ``hex_code``.
+    """
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://www.thecolorapi.com/id?hex={hex_code}") as r:
+            if r.status == 200:
+                data = await r.json()
+            else:
+                return await message.channel.send("Erreur lors de la requête "
+                                                  f"({r.status})")
+
+    title = f"{data['name']['value']} color"
+    description = f"**Hex:** #{hex_code}\n"
+    description += "\n".join("**{}:** {}, {}, {}".format(
+        color_format.capitalize(),
+        *[data[color_format][letter]
+          for letter in tuple(color_format)])
+              for color_format in ("rgb", "hsl", "hsv"))
+
+    return discord.Embed(title=title,
+                         description=description,
+                         color=int(hex_code, base=16))
+
+
 class Omega(commands.Cog):
     def __init__(self, bot, config):
         self.bot = bot
@@ -97,6 +124,13 @@ class Omega(commands.Cog):
     @commands.Cog.listener()
     @user_only()
     async def on_message(self, message):
+        # Checks if the message is an hex code
+        if re.match("^#([A-Fa-f0-9]{6})$", message.content):
+            hex_code = message.content.lstrip("#")
+            color_embed = await make_color_embed(hex_code)
+
+            await message.channel.send(embed=color_embed)
+
         # Check if the message has an issue identifier in it
         if re.search("(^| )#[0-9]+e?($| )", message.content):
             async for i in get_github_issues(message):
