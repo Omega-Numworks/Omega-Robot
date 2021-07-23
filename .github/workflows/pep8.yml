@@ -16,7 +16,9 @@ jobs:
     - name: 'Run PEP8'
       id: run_pep8
       run: |
-        pylint **/*.py
+        output=$(pylint **/*.py)
+        echo "::set-output name=exit-code::$?"
+        echo "::set-output name=output::$output"
       continue-on-error: true
     - name: 'Comment'
       uses: actions/github-script@v3
