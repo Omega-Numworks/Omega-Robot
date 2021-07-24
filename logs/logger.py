@@ -1,3 +1,5 @@
+"""Contains logger used by bot."""
+
 import logging
 from logging.handlers import RotatingFileHandler
 
