@@ -16,28 +16,31 @@ jobs:
     - name: 'Run PEP8'
       id: run_pep8
       run: |
-        output=$(pylint **/*.py)
-        echo "::set-output name=exit-code::$?"
-        echo "::set-output name=output::$output"
+        echo "::set-output name=output::$(pylint **/*.py)"
       continue-on-error: true
-    - name: 'Comment'
+    - if: steps.run_pep8.outcome == 'failure'
+      name: 'Comment (failure)'
       uses: actions/github-script@v3
-      env:
-        EXIT_CODE: ${{ steps.run_pep8.outputs.exit-code }}
-        OUTPUT: ${{ steps.run_pep8.outputs.output }}
       with:
         github-token: ${{ secrets.OMEGA_ROBOT_TOKEN }}
         script: |
-          var message;
-          if (process.env.EXIT_CODE === '0') {
-            message = 'Beep Beep! No formatting errors detected! :partying_face:'
-          } else {
-            message = 'Beep Beep! I found some formatting errors in this PR: \n'
-            message += ' \n``` \n' + process.env.OUTPUT + ' \n```'
-          }
+          const title = "Beep Beep! I found some formatting errors in this PR: \n"
+
           github.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: message,
+            body: title + ' \n``` \n' + steps.run_pep8.outputs.output + ' \n```'
+          })
+    - if: steps.run_pep8.outcome == 'success'
+      name: 'Comment (success)'
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{ secrets.OMEGA_ROBOT_TOKEN }}
+        script: |
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'Beep Beep! No formatting errors detected! :partying_face:'
           })
