@@ -1,3 +1,4 @@
+"""Main file, intended to be launched."""
 
 __version__ = "under developpement"
 
@@ -17,6 +18,7 @@ with open("config.json", encoding="utf-8") as file:
 
 
 class Bot(commands.Bot):
+    """Encapsulate a discord bot."""
     extensions = (
         Fun,
         Moderation,
@@ -30,7 +32,10 @@ class Bot(commands.Bot):
         self.token = config["TOKEN"]
 
     async def on_ready(self):
-        print(f"Bot {self.user.name} connected on {len(self.guilds)} servers")
+        """Log information about bot launching."""
+        logger.info("Bot %s connected on %s servers",
+                    self.user.name,
+                    len(self.guilds))
 
     async def on_command(self, msg):
         """Log each command submitted. Log message provides information

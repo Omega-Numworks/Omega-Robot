@@ -1,3 +1,4 @@
+"""Contains unrelated bot functions used in ``cogs/`` """
 
 from discord.ext import commands
 
