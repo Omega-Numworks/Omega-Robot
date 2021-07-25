@@ -16,7 +16,7 @@ jobs:
     - name: 'Run PEP8'
       id: run_pep8
       run: |
-        echo "::set-output name=output::$(pylint **/*.py)"
+        echo "::set-output name=output::${${${$(pylint **/*.py)//'%'/'%25'}//$'\n'/%0A}//$'\r'/%0D}"
         pylint **/*.py
       continue-on-error: true
     - if: steps.run_pep8.outcome == 'failure'
