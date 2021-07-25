@@ -22,6 +22,8 @@ jobs:
     - if: steps.run_pep8.outcome == 'failure'
       name: 'Comment (failure)'
       uses: actions/github-script@v3
+      env:
+        OUTPUT: ${{ steps.run_pep8.outputs.output }}
       with:
         script: |
           const title = "Beep Beep! I found some formatting errors in this PR: \n"
@@ -30,7 +32,7 @@ jobs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: title + ' \n``` \n' + steps.run_pep8.outputs.output + ' \n```'
+            body: title + ' \n``` \n' + process.env.OUTPUT + ' \n```'
           })
     - if: steps.run_pep8.outcome == 'success'
       name: 'Comment (success)'
