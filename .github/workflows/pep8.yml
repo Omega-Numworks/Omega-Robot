@@ -17,6 +17,7 @@ jobs:
       id: run_pep8
       run: |
         echo "::set-output name=output::$(pylint **/*.py)"
+        pylint **/*.py
       continue-on-error: true
     - if: steps.run_pep8.outcome == 'failure'
       name: 'Comment (failure)'
