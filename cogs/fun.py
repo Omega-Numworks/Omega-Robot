@@ -7,6 +7,8 @@ from bs4 import BeautifulSoup
 import discord
 from discord.ext import commands
 
+from emoji import UNICODE_EMOJI
+
 from src.utils import user_only
 
 
@@ -108,6 +110,16 @@ class Fun(commands.Cog):
         embed.set_image(url=img_url)
 
         await ctx.send(embed=embed)
+
+
+class Confession(commands.Cog):
+    """Cog dedicated to the confession feature."""
+
+    def __init__(self, bot, config):
+        self.bot = bot
+        self.config = config
+
+        self.confession_queue = {}
 
     @commands.Cog.listener()
     @user_only()
