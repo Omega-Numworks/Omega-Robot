@@ -3,7 +3,6 @@
 import asyncio
 from datetime import datetime
 import re
-import requests
 from typing import AsyncGenerator
 
 import aiohttp
@@ -174,6 +173,7 @@ class Omega(commands.Cog):
 
                 # After 60 seconds, it deletes it from the storage dictionary.
                 await asyncio.sleep(60)
+                await issue_embed.remove_reaction("🗑️", self.bot.user)
                 self.issue_embeds.pop(issue_embed.id)
 
     @commands.Cog.listener()
