@@ -19,14 +19,18 @@ async def get_github_issues(message: discord.Message) -> AsyncGenerator[dict, No
 
     If a request error occurs, it sends a message and stops.
     """
-    matches = re.findall("(?=((^| )#[0-9]+e?($| )))", message.content)
+    matches = re.findall("(?=((^| )#[0-9]+(e|u)?($| )))", message.content)
 
     async with aiohttp.ClientSession() as session:
         for i in matches:
             issue = i[0].strip("#e ")
-            repo = ("numworks/epsilon"
-                    if "e" in i[0]
-                    else "omega-numworks/omega")
+            issue = issue.strip("#u ")
+            if "e" in i[0]:
+                repo = "numworks/epsilon"
+            elif "u" in i[0]:
+                repo = "UpsilonNumworks/Upsilon"
+            else:
+                repo = "omega-numworks/omega"
 
             async with session.get(f"https://api.github.com/repos/{repo}/issues/{issue}") as response:
                 if response.status != 200:
@@ -157,7 +161,7 @@ class Omega(commands.Cog):
             await message.channel.send(embed=color_embed)
 
         # Check if the message has an issue identifier in it
-        if re.search("(^| )#[0-9]+e?($| )", message.content):
+        if re.search("(^| )#[0-9]+(e|u)?($| )", message.content):
             async for i in get_github_issues(message):
                 # Create an embed with the data from the issue
                 embed = await make_embed(i)
