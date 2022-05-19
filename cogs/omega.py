@@ -18,16 +18,20 @@ async def get_github_issues(message: discord.Message) -> AsyncGenerator[dict, No
 
     If a request error occurs, it sends a message and stops.
     """
-    matches = re.findall("(?=((^| )#[0-9]+(e|u)?($| )))", message.content)
+    matches = re.findall("(?=((^| )#[0-9]+(e|u|l)?($| )))", message.content)
 
     async with aiohttp.ClientSession() as session:
         for i in matches:
             issue = i[0].strip("#e ")
             issue = issue.strip("#u ")
+            issue = issue.strip("#l ")
+
             if "e" in i[0]:
                 repo = "numworks/epsilon"
             elif "u" in i[0]:
                 repo = "UpsilonNumworks/Upsilon"
+            elif "l" in i[0]:
+                repo = "Lambda-Numworks/Lambda"
             else:
                 repo = "omega-numworks/omega"
 
