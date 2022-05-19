@@ -53,14 +53,6 @@ class Bot(commands.Bot):
                    f"args {args_info}.")
         logger.info(log_msg)
 
-    async def on_message_delete(self, msg):
-        """Log each message deleted. Log message provides information
-        about author, content and date of the message.
-        """
-        log_msg = (f"{msg.author} has deleted his message: "
-                   f"{msg.content!r} sent at {msg.created_at}")
-        logger.info(log_msg)
-
     def run(self):
         """Start the bot and load one by one available cogs."""
         for cog in self.extensions:
