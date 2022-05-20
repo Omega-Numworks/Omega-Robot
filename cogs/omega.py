@@ -166,7 +166,7 @@ class Omega(commands.Cog):
             await message.channel.send(embed=color_embed)
 
         # Check if the message has an issue identifier in it
-        if re.search("(^| )#[0-9]+(e|u|l)?($| )", message.content):
+        if re.search("(^| )#[0-9]+(e|u|l|w)?($| )", message.content):
             async for i in get_github_issues(message):
                 # Create an embed with the data from the issue
                 embed = await make_embed(i)
