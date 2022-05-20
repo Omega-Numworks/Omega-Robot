@@ -18,7 +18,7 @@ async def get_github_issues(message: discord.Message) -> AsyncGenerator[dict, No
 
     If a request error occurs, it sends a message and stops.
     """
-    matches = re.findall("(?=((^| )#[0-9]+(e|u|l)?($| )))", message.content)
+    matches = re.findall("(?=((^| )#[0-9]+(e|u|l|w)?($| )))", message.content)
 
     async with aiohttp.ClientSession() as session:
         for i in matches:
@@ -30,6 +30,8 @@ async def get_github_issues(message: discord.Message) -> AsyncGenerator[dict, No
                 repo = "numworks/epsilon"
             elif "u" in i[0]:
                 repo = "UpsilonNumworks/Upsilon"
+            elif "w" in i[0]:
+                repo = "UpsilonNumworks/Upsilon-Website"
             elif "l" in i[0]:
                 repo = "Lambda-Numworks/Lambda"
             else:
