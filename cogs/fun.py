@@ -19,7 +19,7 @@ actions = {
     "cuddle": "{author} cuddles {target} :heart:",
     "poke": "Hey {target}! {author} poked you",
     "baka": "{target} BAKA",
-    "slap": "{author} slapped {target}!"
+    "slap": "{author} slapped {target}!",
 }
 
 
@@ -49,7 +49,9 @@ class Fun(commands.Cog):
 
         # Make a request to the nekos.life API at the command's name endpoint.
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://nekos.life/api/v2/img/{ctx.invoked_with}") as response:
+            async with session.get(
+                f"https://nekos.life/api/v2/img/{ctx.invoked_with}"
+            ) as response:
                 if response.status == 200:
                     data = await response.json()
                 else:
@@ -88,9 +90,11 @@ class Fun(commands.Cog):
                     apod = await response.text()
                 else:
                     # Send an error embed.
-                    embed.description = ("Sorry, a problem has occurred when "
-                                         "trying to interact with the apod "
-                                         "website")
+                    embed.description = (
+                        "Sorry, a problem has occurred when "
+                        "trying to interact with the apod "
+                        "website"
+                    )
                     return await ctx.send(embed=embed)
 
         # Collect informations.
@@ -121,10 +125,13 @@ class Confession(commands.Cog):
 
         self.confession_queue = {}
 
+        self.confession_is_confirm_e: Optional[bool] = None
+        self.confession_msg: Optional[str] = None
+
     @commands.Cog.listener()
     @user_only()
     async def on_message(self, message):
-        """"Decide to store message and send a confirm message."""
+        """ "Decide to store message and send a confirm message."""
         self.confession_is_confirm_e = False
 
         # Check if Confession is enabled.
@@ -145,8 +152,12 @@ class Confession(commands.Cog):
         """Decide to send stored confession message."""
         reaction_user = await self.bot.fetch_user(reaction.user_id)
         reaction_channel = await self.bot.fetch_channel(reaction.channel_id)
-        confession_channel = await self.bot.fetch_channel(self.config["CONFESSION"]["CHANNEL"])
-        user_in_chan_guild = await confession_channel.guild.fetch_member(reaction.user_id)
+        confession_channel = await self.bot.fetch_channel(
+            self.config["CONFESSION"]["CHANNEL"]
+        )
+        user_in_chan_guild = await confession_channel.guild.fetch_member(
+            reaction.user_id
+        )
 
         if reaction_user.bot or not self.confession_is_confirm_e:
             return

@@ -35,7 +35,9 @@ async def get_github_issues(message: discord.Message) -> AsyncGenerator[dict, No
             else:
                 repo = "omega-numworks/omega"
 
-            async with session.get(f"https://api.github.com/repos/{repo}/issues/{issue}") as response:
+            async with session.get(
+                f"https://api.github.com/repos/{repo}/issues/{issue}"
+            ) as response:
                 if response.status != 200:
                     await message.channel.send(
                         f"Erreur lors de la requête ({response.status})"
@@ -56,9 +58,7 @@ async def make_embed(data: dict) -> discord.Embed:
 
     author = data["user"]
     embed.set_author(
-        name=author["login"],
-        url=author["html_url"],
-        icon_url=author["avatar_url"]
+        name=author["login"], url=author["html_url"], icon_url=author["avatar_url"]
     )
 
     additional_infos = []
@@ -96,14 +96,12 @@ async def make_embed(data: dict) -> discord.Embed:
         embed.add_field(name="Commits", value=result)
 
     if data["comments"]:
-        additional_infos.append(
-            f":speech_balloon: Comments : {data['comments']}"
-        )
+        additional_infos.append(f":speech_balloon: Comments : {data['comments']}")
 
     if data["state"] == "closed":
-        closed_at = datetime.strptime(
-            data["closed_at"], "%Y-%m-%dT%H:%M:%SZ"
-        ).strftime("%b. %d %H:%M %Y")
+        closed_at = datetime.strptime(data["closed_at"], "%Y-%m-%dT%H:%M:%SZ").strftime(
+            "%b. %d %H:%M %Y"
+        )
 
         additional_infos.append(
             f":x: Closed by {data['closed_by']['login']} on {closed_at}"
@@ -113,13 +111,10 @@ async def make_embed(data: dict) -> discord.Embed:
         additional_infos.append(":white_check_mark: Open")
 
     if data["labels"]:
-        labels = '` `'.join(i['name'] for i in data['labels'])
+        labels = "` `".join(i["name"] for i in data["labels"])
         additional_infos.append(f":label: Labels: `{labels}`")
 
-    embed.add_field(
-        name="Additional informations",
-        value="\n".join(additional_infos)
-    )
+    embed.add_field(name="Additional informations", value="\n".join(additional_infos))
 
     return embed
 
@@ -139,11 +134,13 @@ async def make_color_embed(hex_code: int) -> discord.Embed:
 
     title = f"{data['name']['value']} color"
     description = f"**Hex:** #{hex_code}\n"
-    description += "\n".join("**{}:** {}, {}, {}".format(
-        color_format.capitalize(),
-        *[data[color_format][letter]
-          for letter in tuple(color_format)])
-              for color_format in ("rgb", "hsl", "hsv"))
+    description += "\n".join(
+        "**{}:** {}, {}, {}".format(
+            color_format.capitalize(),
+            *[data[color_format][letter] for letter in tuple(color_format)],
+        )
+        for color_format in ("rgb", "hsl", "hsv")
+    )
 
     return discord.Embed(
         title=title, description=description, color=int(hex_code, base=16)
@@ -198,8 +195,9 @@ class Omega(commands.Cog):
 
         # If the reaction is "🗑️" and on a message stored in issue_embeds,
         # it deletes it on discord and in the storage dictionary.
-        if (reaction.emoji.name == "🗑️"
-                and self.issue_embeds.pop(reaction.message_id, None)):
+        if reaction.emoji.name == "🗑️" and self.issue_embeds.pop(
+            reaction.message_id, None
+        ):
             channel = self.bot.get_channel(reaction.channel_id)
             message = await channel.fetch_message(reaction.message_id)
             await message.delete()
