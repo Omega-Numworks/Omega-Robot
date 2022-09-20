@@ -75,8 +75,10 @@ async def make_embed(data: dict) -> discord.Embed:
 
         # Format all commits data into strings.
         formatted = [
-            f"[`{commit['sha'][:7]}`]({commit['html_url']}) {commit['commit']['message']} - {commit['committer']['login']}"
-            for commit in commits_data
+            (
+                f"[`{commit['sha'][:7]}`]({commit['html_url']})"
+                f" {commit['commit']['message']} - {commit['committer']['login']}"
+            ) for commit in commits_data
         ]
 
         result = "\n".join(formatted)
@@ -128,21 +130,21 @@ async def make_color_embed(
     async with aiohttp.ClientSession() as session:
         async with session.get(
             f"https://www.thecolorapi.com/id?hex={hex_code}"
-        ) as respone:
-            if respone.status == 200:
-                data = await respone.json()
+        ) as response:
+            if response.status == 200:
+                data = await response.json()
             else:
                 await message.channel.send(
-                    f"Erreur lors de la requête ({respone.status})"
+                    f"Erreur lors de la requête ({response.status})"
                 )
                 return
 
     title = f"{data['name']['value']} color"
     description = f"**Hex:** #{hex_code}\n"
     description += "\n".join(
-        "**{}:** {}, {}, {}".format(
-            color_format.capitalize(),
-            *[data[color_format][letter] for letter in tuple(color_format)],
+        (
+            f"**{color_format.capitalize()}:**"
+            f"{', '.join(data[color_format][letter] for letter in tuple(color_format))}"
         )
         for color_format in ("rgb", "hsl", "hsv")
     )
