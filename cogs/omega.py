@@ -3,7 +3,7 @@
 import asyncio
 from datetime import datetime
 import re
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 import aiohttp
 import discord
@@ -18,7 +18,7 @@ async def get_github_issues(message: discord.Message) -> AsyncGenerator[dict, No
 
     If a request error occurs, it sends a message and stops.
     """
-    matches = re.findall("(?=((^| )#[0-9]+(e|u|l)?($| )))", message.content)
+    matches = re.findall("(?=((^| )#[0-9]+([eul])?($| )))", message.content)
 
     async with aiohttp.ClientSession() as session:
         for i in matches:
@@ -35,36 +35,38 @@ async def get_github_issues(message: discord.Message) -> AsyncGenerator[dict, No
             else:
                 repo = "omega-numworks/omega"
 
-            async with session.get(f"https://api.github.com/repos/{repo}/issues/{issue}") as response:
+            async with session.get(
+                f"https://api.github.com/repos/{repo}/issues/{issue}"
+            ) as response:
                 if response.status != 200:
-                    await message.channel.send("Erreur lors de la requête "
-                                               f"({response.status})")
+                    await message.channel.send(
+                        f"Erreur lors de la requête ({response.status})"
+                    )
                     return
                 yield await response.json()
 
 
 async def make_embed(data: dict) -> discord.Embed:
     """Return a formatted ``discord.Embed`` from given data."""
-    embed = discord.Embed(title=data["title"],
-                          url=data["html_url"],
-                          description=data["body"])
+    embed = discord.Embed(
+        title=data["title"], url=data["html_url"], description=data["body"]
+    )
 
     # Truncate the description if it's above the maximum size.
     if len(embed.description) > 2048:
-        embed.description = embed.description[:2043] + "[...]"
+        embed.description = f"{embed.description[:2043]}[...]"
 
     author = data["user"]
-    embed.set_author(name=author["login"],
-                     url=author["html_url"],
-                     icon_url=author["avatar_url"])
+    embed.set_author(
+        name=author["login"], url=author["html_url"], icon_url=author["avatar_url"]
+    )
 
     additional_infos = []
 
     if data.get("locked"):
         additional_infos.append(":lock: locked")
 
-    pull_request = data.get("pull_request")
-    if pull_request:
+    if pull_request := data.get("pull_request"):
         additional_infos.append(":arrows_clockwise: Pull request")
 
         async with aiohttp.ClientSession() as session:
@@ -72,11 +74,12 @@ async def make_embed(data: dict) -> discord.Embed:
                 commits_data = await response.json()
 
         # Format all commits data into strings.
-        formatted = ["[`{}`]({}) {} - {}".format(commit['sha'][:7],
-                                                 commit['html_url'],
-                                                 commit['commit']['message'],
-                                                 commit['committer']['login'])
-                     for commit in commits_data]
+        formatted = [
+            (
+                f"[`{commit['sha'][:7]}`]({commit['html_url']})"
+                f" {commit['commit']['message']} - {commit['committer']['login']}"
+            ) for commit in commits_data
+        ]
 
         result = "\n".join(formatted)
 
@@ -95,51 +98,60 @@ async def make_embed(data: dict) -> discord.Embed:
         embed.add_field(name="Commits", value=result)
 
     if data["comments"]:
-        additional_infos.append(":speech_balloon: Comments : "
-                                f"{data['comments']}")
+        additional_infos.append(f":speech_balloon: Comments : {data['comments']}")
 
     if data["state"] == "closed":
-        closed_at = datetime.strptime(data["closed_at"],
-                                      "%Y-%m-%dT%H:%M:%SZ").strftime("%b. %d %H:%M %Y")
-        additional_infos.append(":x: Closed by "
-                                f"{data['closed_by']['login']} on "
-                                f"{closed_at}")
+        closed_at = datetime.strptime(data["closed_at"], "%Y-%m-%dT%H:%M:%SZ").strftime(
+            "%b. %d %H:%M %Y"
+        )
+
+        additional_infos.append(
+            f":x: Closed by {data['closed_by']['login']} on {closed_at}"
+        )
+
     elif data["state"] == "open":
         additional_infos.append(":white_check_mark: Open")
 
     if data["labels"]:
-        labels = '` `'.join(i['name'] for i in data['labels'])
+        labels = "` `".join(i["name"] for i in data["labels"])
         additional_infos.append(f":label: Labels: `{labels}`")
 
-    embed.add_field(name="Additional informations",
-                    value="\n".join(additional_infos))
+    embed.add_field(name="Additional informations", value="\n".join(additional_infos))
 
     return embed
 
 
-async def make_color_embed(hex_code: int) -> discord.Embed:
+async def make_color_embed(
+    hex_code: int, message: discord.Message
+) -> Optional[discord.Embed]:
     """Return a ``discord.Embed`` contains some informations about color
     of given ``hex_code``.
     """
     async with aiohttp.ClientSession() as session:
-        async with session.get(f"https://www.thecolorapi.com/id?hex={hex_code}") as r:
-            if r.status == 200:
-                data = await r.json()
+        async with session.get(
+            f"https://www.thecolorapi.com/id?hex={hex_code}"
+        ) as response:
+            if response.status == 200:
+                data = await response.json()
             else:
-                return await message.channel.send("Erreur lors de la requête "
-                                                  f"({r.status})")
+                await message.channel.send(
+                    f"Erreur lors de la requête ({response.status})"
+                )
+                return
 
     title = f"{data['name']['value']} color"
     description = f"**Hex:** #{hex_code}\n"
-    description += "\n".join("**{}:** {}, {}, {}".format(
-        color_format.capitalize(),
-        *[data[color_format][letter]
-          for letter in tuple(color_format)])
-              for color_format in ("rgb", "hsl", "hsv"))
+    description += "\n".join(
+        (
+            f"**{color_format.capitalize()}:**"
+            f"{', '.join(data[color_format][letter] for letter in tuple(color_format))}"
+        )
+        for color_format in ("rgb", "hsl", "hsv")
+    )
 
-    return discord.Embed(title=title,
-                         description=description,
-                         color=int(hex_code, base=16))
+    return discord.Embed(
+        title=title, description=description, color=int(hex_code, base=16)
+    )
 
 
 class Omega(commands.Cog):
@@ -159,7 +171,7 @@ class Omega(commands.Cog):
         # Checks if the message is an hex code
         if re.match("^#([A-Fa-f0-9]{6})$", message.content):
             hex_code = message.content.lstrip("#")
-            color_embed = await make_color_embed(hex_code)
+            color_embed = await make_color_embed(hex_code, message)
 
             await message.channel.send(embed=color_embed)
 
@@ -190,8 +202,9 @@ class Omega(commands.Cog):
 
         # If the reaction is "🗑️" and on a message stored in issue_embeds,
         # it deletes it on discord and in the storage dictionary.
-        if (reaction.emoji.name == "🗑️"
-                and self.issue_embeds.pop(reaction.message_id, None)):
+        if reaction.emoji.name == "🗑️" and self.issue_embeds.pop(
+            reaction.message_id, None
+        ):
             channel = self.bot.get_channel(reaction.channel_id)
             message = await channel.fetch_message(reaction.message_id)
             await message.delete()
