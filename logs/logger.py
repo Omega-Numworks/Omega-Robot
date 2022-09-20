@@ -8,9 +8,10 @@ logger = logging.getLogger("Omega-robot logger")
 logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
-file_handler = RotatingFileHandler("logs/logbooks/activity.log",
-                                   maxBytes=5000000,
-                                   backupCount=5)
+file_handler = RotatingFileHandler(
+    "logs/logbooks/activity.log",
+    maxBytes=5000000, backupCount=5
+)
 
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)

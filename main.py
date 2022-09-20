@@ -5,6 +5,7 @@ __version__ = "under developpement"
 import json
 
 from discord.ext import commands
+from discord import Intents
 
 from cogs.omega import Omega
 from cogs.moderation import Moderation
@@ -30,16 +31,18 @@ class Bot(commands.Bot):
     }
 
     def __init__(self):
-        super().__init__(config["PREFIX"])
+        super().__init__(config["PREFIX"], intents=Intents.all())
 
         self.description = "A bot for two Omega Discord servers."
         self.token = config["TOKEN"]
 
     async def on_ready(self):
         """Log information about bot launching."""
-        logger.info("Bot %s connected on %s servers",
-                    self.user.name,
-                    len(self.guilds))
+        logger.info(
+            "Bot %s connected on %s servers",
+            self.user.name, len(self.guilds)
+        )
+        await self.load_extensions()
 
     async def on_command(self, msg):
         """Log each command submitted. Log message provides information
@@ -53,16 +56,17 @@ class Bot(commands.Bot):
                    f"args {args_info}.")
         logger.info(log_msg)
 
-    def run(self):
+    def run(self, **kwargs):
         """Start the bot and load one by one available cogs."""
+        super().run(self.token)
+
+    async def load_extensions(self):
         for cog in self.extensions:
-            self.add_cog(cog(self, config))
+            await self.add_cog(cog(self, config))
 
         for cog, requirement in self.optionals.items():
             if requirement:
-                self.add_cog(cog(self, config))
-
-        super().run(self.token)
+                await self.add_cog(cog(self, config))
 
 
 if __name__ == "__main__":

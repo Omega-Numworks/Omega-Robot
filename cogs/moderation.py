@@ -1,9 +1,7 @@
 """Contains cog related to moderation."""
 
 import re
-import unicodedata
 
-import discord
 from discord.ext import commands
 
 from src.utils import user_only
@@ -16,8 +14,10 @@ class Moderation(commands.Cog):
         self.bot = bot
         self.config = config
 
-        self.regex_patterns = {chan_id: re.compile(pattern)
-                               for chan_id, pattern in config["REGEX_CHANNELS"].items()}
+        self.regex_patterns = {
+            chan_id: re.compile(pattern)
+            for chan_id, pattern in config["REGEX_CHANNELS"].items()
+        }
 
     @commands.Cog.listener()
     @user_only()

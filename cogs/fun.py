@@ -3,14 +3,11 @@
 from typing import Optional
 
 import aiohttp
-from bs4 import BeautifulSoup
 import discord
+from bs4 import BeautifulSoup
 from discord.ext import commands
 
-from emoji import UNICODE_EMOJI
-
 from src.utils import user_only
-
 
 # Supported action commands with they template.
 # {author} -> command author's mention
@@ -58,9 +55,10 @@ class Fun(commands.Cog):
                 else:
                     # Send an error embed.
                     embed.title = "API error"
-                    embed.description = ("Sorry, a problem has occurred when "
-                                         "trying to interact with the "
-                                         "nekos.life API")
+                    embed.description = (
+                        "Sorry, a problem has occurred when trying to interact "
+                        "with the nekos.life API"
+                    )
                     return await ctx.send(embed=embed)
 
         # Place the nekos.life's gif in the embed.
@@ -68,11 +66,13 @@ class Fun(commands.Cog):
 
         # Make a custom message based on the command's template message.
         if ctx.author.id != member.id:
-            embed.description = actions[ctx.invoked_with].format(author=ctx.author.name,
-                                                                 target=member.name)
+            embed.description = actions[ctx.invoked_with].format(
+                author=ctx.author.name, target=member.name
+            )
         else:
-            embed.description = ("Aww, I see you are lonely, I will "
-                                 f"{ctx.invoked_with} you")
+            embed.description = (
+                f"Aww, I see you are lonely, I will {ctx.invoked_with} you"
+            )
 
         await ctx.send(embed=embed)
 
@@ -136,8 +136,9 @@ class Confession(commands.Cog):
         if not message.guild:
             self.confession_is_confirm_e = True
             self.confession_msg = message
-            await message.channel.send("React to this message to send it to "
-                                       "the confession channel")
+            await message.channel.send(
+                "React to this message to send it to the confession channel"
+            )
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, reaction):
@@ -147,13 +148,11 @@ class Confession(commands.Cog):
         confession_channel = await self.bot.fetch_channel(self.config["CONFESSION"]["CHANNEL"])
         user_in_chan_guild = await confession_channel.guild.fetch_member(reaction.user_id)
 
-        if (reaction_user.bot
-                or not self.confession_is_confirm_e):
+        if reaction_user.bot or not self.confession_is_confirm_e:
             return
 
         # If reaction is in DM and user is present in confession channel,
-        # send the message.
-        if (reaction_channel.type.name == "private"
-                and user_in_chan_guild is not None):
+        # send the message.
+        if reaction_channel.type.name == "private" and user_in_chan_guild is not None:
             self.confession_is_confirm_e = False
             await confession_channel.send(self.confession_msg.content)
