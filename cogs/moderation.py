@@ -23,7 +23,6 @@ class Moderation(commands.Cog):
     @user_only()
     async def on_message(self, message):
         """Delete message that does not match the channel regex."""
-        pattern = self.regex_patterns.get(str(message.channel.id))
-        if pattern:
+        if pattern := self.regex_patterns.get(str(message.channel.id)):
             if not pattern.fullmatch(message.content):
                 await message.delete()

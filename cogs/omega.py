@@ -51,7 +51,7 @@ async def make_embed(data: dict) -> discord.Embed:
 
     # Truncate the description if it's above the maximum size.
     if len(embed.description) > 2048:
-        embed.description = embed.description[:2043] + "[...]"
+        embed.description = f"{embed.description[:2043]}[...]"
 
     author = data["user"]
     embed.set_author(name=author["login"],
@@ -63,8 +63,7 @@ async def make_embed(data: dict) -> discord.Embed:
     if data.get("locked"):
         additional_infos.append(":lock: locked")
 
-    pull_request = data.get("pull_request")
-    if pull_request:
+    if pull_request := data.get("pull_request"):
         additional_infos.append(":arrows_clockwise: Pull request")
 
         async with aiohttp.ClientSession() as session:
@@ -72,11 +71,11 @@ async def make_embed(data: dict) -> discord.Embed:
                 commits_data = await response.json()
 
         # Format all commits data into strings.
-        formatted = ["[`{}`]({}) {} - {}".format(commit['sha'][:7],
-                                                 commit['html_url'],
-                                                 commit['commit']['message'],
-                                                 commit['committer']['login'])
-                     for commit in commits_data]
+        formatted = [
+            f"[`{commit['sha'][:7]}`]({commit['html_url']}) {commit['commit']['message']} - {commit['committer']['login']}"
+            for commit in commits_data
+        ]
+
 
         result = "\n".join(formatted)
 
