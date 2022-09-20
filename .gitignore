@@ -1,6 +1,13 @@
-.vscode
+# IDE configuration folder
 .idea
+.vscode
 
-__pycache__/
-env/
-logs/logbooks/
+# Logs
+logs/logbooks
+
+# Secret files
+env
+
+# Python environement
+__pycache__
+venv
