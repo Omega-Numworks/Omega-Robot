@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import discord
 from discord.ext import commands
 
-from emoji import UNICODE_EMOJI
+# from emoji import UNICODE_EMOJI
 
 from src.utils import user_only
 

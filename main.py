@@ -4,6 +4,7 @@ __version__ = "under developpement"
 
 import json
 
+from discord import Intents
 from discord.ext import commands
 
 from cogs.omega import Omega
@@ -30,7 +31,9 @@ class Bot(commands.Bot):
     }
 
     def __init__(self):
-        super().__init__(config["PREFIX"])
+        intents = Intents.default()
+        intents.message_content = True
+        super().__init__(config["PREFIX"], intents=intents)
 
         self.description = "A bot for two Omega Discord servers."
         self.token = config["TOKEN"]
